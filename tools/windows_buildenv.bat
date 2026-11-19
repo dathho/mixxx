@@ -37,7 +37,7 @@ IF /I "%PLATFORM%"=="arm64" (
         SET BUILDENV_BRANCH=2.7-rel
         SET VCPKG_TARGET_TRIPLET=arm64-windows-release
         SET BUILDENV_NAME=mixxx-deps-2.7-arm64-windows-rel-ee6dc7fe
-        SET BUILDENV_SHA256=38218f4874d3852a0689009385fe0106ff089511e37d7c062bc698449c8b9110
+        SET BUILDENV_SHA256=e776c4b5ee5df3a02c4d5a1c19ba73fd7fa3268ef0823c4f6ffe1cbdb04ba11e
     ) ELSE (
         SET BUILDENV_BRANCH=2.7
         SET VCPKG_TARGET_TRIPLET=arm64-windows
@@ -58,8 +58,8 @@ IF /I "%PLATFORM%"=="arm64" (
     )
 ) ELSE (
     ECHO ^ERROR: Unsupported PLATFORM: %PLATFORM%
-    ECHO ^Please refer to the following guide to manually build the vcpkg environment:"
-    ECHO ^https://github.com/mixxxdj/mixxx/wiki/Compiling-dependencies-for-macOS-arm64"
+    ECHO ^Please refer to the following guide to manually build the vcpkg environment:
+    ECHO ^https://github.com/mixxxdj/mixxx/wiki/Compiling-dependencies-for-macOS-arm64
     PAUSE
     EXIT /B 1
 )
