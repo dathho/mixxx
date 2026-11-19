@@ -194,7 +194,11 @@ if(
           )
         endif()
 
-        math(EXPR _buildenv_download_attempt "${_buildenv_download_attempt} + 1")
+        math(
+          EXPR
+          _buildenv_download_attempt
+          "${_buildenv_download_attempt} + 1"
+        )
         message(
           WARNING
           "SHA256 checksum mismatch (download status: ${download_status}); "
