@@ -58,8 +58,8 @@ IF /I "%PLATFORM%"=="arm64" (
     )
 ) ELSE (
     ECHO ^ERROR: Unsupported PLATFORM: %PLATFORM%
-    ECHO ^Please refer to the following guide to manually build the vcpkg environment:
-    ECHO ^https://github.com/mixxxdj/mixxx/wiki/Compiling-dependencies-for-macOS-arm64
+    ECHO ^Please refer to the following guide to manually build the vcpkg environment:"
+    ECHO ^https://github.com/mixxxdj/mixxx/wiki/Compiling-dependencies-for-macOS-arm64"
     PAUSE
     EXIT /B 1
 )
@@ -206,7 +206,7 @@ REM Generate CMakeSettings.json which is read by MS Visual Studio to determine t
     REM <compiler>_<architecture>_<host_arch>
     >>"%CMakeSettings%" echo       "inheritEnvironments": [ "msvc_!PLATFORM!_!HOST_ARCH!" ],
     >>"%CMakeSettings%" echo       "installRoot": "!INSTALL_ROOT:\=\\!\\${name}",
-    >>"%CMakeSettings%" echo       "cmakeToolchain": "!MIXXX_VCPKG_ROOT:\=\\!\\scripts\\buildsystems\\vcpkg.cmake",
+    >>"%CMakeSettings%" echo       "cmakeToolchain": "!MIXXX_VCPKG_ROOT:\=\\!\\scripts\\buildsystems\vcpkg.cmake",
     REM <platform>-<compiler>-<architecture>
     >>"%CMakeSettings%" echo       "intelliSenseMode": "windows-msvc-!PLATFORM!",
     >>"%CMakeSettings%" echo       "variables": [
