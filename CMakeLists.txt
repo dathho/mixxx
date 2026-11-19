@@ -145,6 +145,7 @@ if(
     endif()
 
     set(buildenv_archive "${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip")
+    set(buildenv_archive_ready FALSE)
     foreach(attempt RANGE 1 3)
       if(NOT EXISTS "${buildenv_archive}")
         message(
@@ -152,7 +153,7 @@ if(
           "Downloading file ${BUILDENV_URL} to ${BUILDENV_BASEPATH} (attempt ${attempt}/3) ..."
         )
         file(
-          DOWNLOAD "${BUILDENV_URL}" "${buildenv_archive}"
+          DOWNLOAD "${BUILDENV_URL}" "${buildenv_archive}.part"
           SHOW_PROGRESS
           TLS_VERIFY ON
           STATUS download_status
@@ -160,10 +161,11 @@ if(
         list(GET download_status 0 download_code)
         if(NOT download_code EQUAL 0)
           set(download_error "Download failed: ${download_status}")
-          file(REMOVE "${buildenv_archive}")
+          file(REMOVE "${buildenv_archive}.part")
           message(STATUS "${download_error}")
           continue()
         endif()
+        file(RENAME "${buildenv_archive}.part" "${buildenv_archive}")
       else()
         # Reference to suppress intentionally unused variable warnings
         set(_dummy "${BUILDENV_URL}")
@@ -184,10 +186,11 @@ if(
         endif()
         message(STATUS "SHA256 ${BUILDENV_SHA256} is correct!")
       endif()
+      set(buildenv_archive_ready TRUE)
       break()
     endforeach()
 
-    if(NOT EXISTS "${buildenv_archive}")
+    if(NOT buildenv_archive_ready)
       message(FATAL_ERROR "${download_error}")
     endif()
 
