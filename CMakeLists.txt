@@ -144,36 +144,54 @@ if(
       endif()
     endif()
 
-    if(NOT EXISTS "${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip")
-      message(
-        STATUS
-        "Downloading file ${BUILDENV_URL} to ${BUILDENV_BASEPATH} ..."
-      )
-      file(
-        DOWNLOAD ${BUILDENV_URL} "${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip"
-        SHOW_PROGRESS
-        TLS_VERIFY ON
-      )
-    else()
-      # Reference to suppress intentionally unused variable warnings
-      set(_dummy "${BUILDENV_URL}")
-    endif()
-
-    if(NOT ${BUILDENV_SHA256} STREQUAL "")
-      message(
-        STATUS
-        "Verify SHA256 of downloaded file ${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip ..."
-      )
-      file(SHA256 "${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip" actual_sha256)
-
-      if(NOT actual_sha256 STREQUAL ${BUILDENV_SHA256})
+    set(buildenv_archive "${BUILDENV_BASEPATH}/${BUILDENV_NAME}.zip")
+    set(buildenv_archive_ready FALSE)
+    foreach(attempt RANGE 1 3)
+      if(NOT EXISTS "${buildenv_archive}")
         message(
-          FATAL_ERROR
-          "SHA256 checksum mismatch:\nexpected: ${BUILDENV_SHA256}\n     got: ${actual_sha256}"
+          STATUS
+          "Downloading file ${BUILDENV_URL} to ${BUILDENV_BASEPATH} (attempt ${attempt}/3) ..."
         )
+        file(
+          DOWNLOAD "${BUILDENV_URL}" "${buildenv_archive}.part"
+          SHOW_PROGRESS
+          TLS_VERIFY ON
+          STATUS download_status
+        )
+        list(GET download_status 0 download_code)
+        if(NOT download_code EQUAL 0)
+          set(download_error "Download failed: ${download_status}")
+          file(REMOVE "${buildenv_archive}.part")
+          message(STATUS "${download_error}")
+          continue()
+        endif()
+        file(RENAME "${buildenv_archive}.part" "${buildenv_archive}")
       else()
+        # Reference to suppress intentionally unused variable warnings
+        set(_dummy "${BUILDENV_URL}")
+      endif()
+
+      if(NOT "${BUILDENV_SHA256}" STREQUAL "")
+        message(STATUS "Verify SHA256 of downloaded file ${buildenv_archive} ...")
+        file(SHA256 "${buildenv_archive}" actual_sha256)
+
+        if(NOT actual_sha256 STREQUAL BUILDENV_SHA256)
+          set(
+            download_error
+            "SHA256 checksum mismatch:\nexpected: ${BUILDENV_SHA256}\n     got: ${actual_sha256}"
+          )
+          file(REMOVE "${buildenv_archive}")
+          message(STATUS "${download_error}")
+          continue()
+        endif()
         message(STATUS "SHA256 ${BUILDENV_SHA256} is correct!")
       endif()
+      set(buildenv_archive_ready TRUE)
+      break()
+    endforeach()
+
+    if(NOT buildenv_archive_ready)
+      message(FATAL_ERROR "${download_error}")
     endif()
 
     message(
